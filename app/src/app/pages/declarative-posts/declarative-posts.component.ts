@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DeclarativePostService } from 'src/app/services/DeclaritivePost.service';
+import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
   selector: 'app-declarative-posts',
@@ -8,7 +8,7 @@ import { DeclarativePostService } from 'src/app/services/DeclaritivePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DeclarativePostsComponent {
-  posts$ = this.postService.posts$;
+  posts$ = this.postService.postsWithCategory$;
 
   constructor(private postService: DeclarativePostService) {}
 }
