@@ -4,6 +4,7 @@ import {
   Subject,
   catchError,
   combineLatest,
+  delay,
   forkJoin,
   map,
   share,
@@ -21,6 +22,7 @@ export class DeclarativePostService {
       `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
+      delay(2000),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {
