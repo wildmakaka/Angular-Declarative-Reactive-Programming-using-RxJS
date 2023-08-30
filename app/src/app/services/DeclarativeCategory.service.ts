@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { map, share } from 'rxjs';
 import { ICategory } from 'src/app/models/ICategory';
 
 @Injectable({
@@ -18,7 +18,8 @@ export class DeclarativeCategoryService {
           categoriesData.push({ ...categories[id], id });
         }
         return categoriesData;
-      })
+      }),
+      share()
     );
 
   constructor(private http: HttpClient) {}

@@ -6,6 +6,7 @@ import {
   combineLatest,
   forkJoin,
   map,
+  share,
   throwError,
 } from 'rxjs';
 import { IPost } from 'src/app/models/IPost';
@@ -17,7 +18,7 @@ import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory
 export class DeclarativePostService {
   posts$ = this.http
     .get<{ [id: string]: IPost }>(
-      `https://rxjs-posts-default-rtdb1.firebaseio.com/posts.json`
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
       map((posts) => {
@@ -27,7 +28,8 @@ export class DeclarativePostService {
         }
         return postsData;
       }),
-      catchError(this.handleError)
+      catchError(this.handleError),
+      share()
     );
 
   postsWithCategory$ = forkJoin([
