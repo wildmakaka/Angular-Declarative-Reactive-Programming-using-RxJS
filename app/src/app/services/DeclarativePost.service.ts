@@ -4,10 +4,9 @@ import {
   Subject,
   catchError,
   combineLatest,
-  delay,
   forkJoin,
   map,
-  share,
+  shareReplay,
   throwError,
 } from 'rxjs';
 import { IPost } from 'src/app/models/IPost';
@@ -22,7 +21,6 @@ export class DeclarativePostService {
       `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
-      delay(2000),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {
@@ -31,7 +29,7 @@ export class DeclarativePostService {
         return postsData;
       }),
       catchError(this.handleError),
-      share()
+      shareReplay(1)
     );
 
   postsWithCategory$ = forkJoin([
@@ -48,7 +46,8 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   private selectedPostSubject = new Subject<string>();
@@ -61,7 +60,8 @@ export class DeclarativePostService {
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   constructor(
