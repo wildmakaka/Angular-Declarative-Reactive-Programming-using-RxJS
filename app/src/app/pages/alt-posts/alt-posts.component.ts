@@ -11,7 +11,7 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
 })
 export class AltPostsComponent {
   showAddPost = false;
-  posts$ = this.postService.postsWithCategory$.pipe(
+  posts$ = this.postService.allPosts$.pipe(
     tap((posts) => {
       posts[0].id && this.postService.selectPost(posts[0].id);
     })

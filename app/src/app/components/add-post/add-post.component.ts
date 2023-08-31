@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
+import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
   selector: 'app-add-post',
@@ -17,9 +18,13 @@ export class AddPostComponent {
 
   categories$ = this.categoryService.categories$;
 
-  constructor(private categoryService: DeclarativeCategoryService) {}
+  constructor(
+    private categoryService: DeclarativeCategoryService,
+    private postService: DeclarativePostService
+  ) {}
 
   onAddPost() {
-    console.log(this.postForm.value);
+    //@ts-ignore
+    this.postService.addPost(this.postForm.value);
   }
 } // The End of Class;

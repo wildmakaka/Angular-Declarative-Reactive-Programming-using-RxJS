@@ -6,10 +6,12 @@ import {
   combineLatest,
   forkJoin,
   map,
+  merge,
+  scan,
   shareReplay,
   throwError,
 } from 'rxjs';
-import { IPost } from 'src/app/models/IPost';
+import { CRUDAction, IPost } from 'src/app/models/IPost';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 
 @Injectable({
@@ -49,6 +51,22 @@ export class DeclarativePostService {
     catchError(this.handleError),
     shareReplay(1)
   );
+
+  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDAction$ = this.postCRUDSubject.asObservable();
+
+  allPosts$ = merge(
+    this.postsWithCategory$,
+    this.postCRUDAction$.pipe(map((data) => [data.data]))
+  ).pipe(
+    scan((posts, value) => {
+      return [...posts, ...value];
+    }, [] as IPost[])
+  );
+
+  addPost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'add', data: post });
+  }
 
   private selectedPostSubject = new Subject<string>();
   selectedPostAction$ = this.selectedPostSubject.asObservable();
