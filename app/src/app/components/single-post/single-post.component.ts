@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { BehaviorSubject, EMPTY, catchError } from 'rxjs';
+import { BehaviorSubject, EMPTY, catchError, tap } from 'rxjs';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 
 @Component({
@@ -16,6 +16,9 @@ export class SinglePostComponent {
   errorMessage = '';
 
   post$ = this.postService.post$.pipe(
+    tap((post) => {
+      this.showUpdatePost = false;
+    }),
     catchError((error: string) => {
       this.errorMessageSubject.next(error);
       return EMPTY;
