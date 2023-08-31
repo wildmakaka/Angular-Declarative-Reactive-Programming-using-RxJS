@@ -10,7 +10,8 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AltPostsComponent {
-  posts$ = this.postService.postsWithCategory$.pipe(
+  showAddPost = false;
+  posts$ = this.postService.allPosts$.pipe(
     tap((posts) => {
       posts[0].id && this.postService.selectPost(posts[0].id);
     })
@@ -27,7 +28,11 @@ export class AltPostsComponent {
 
   onSelectPost(post: IPost, event: Event) {
     event.preventDefault();
-
+    this.showAddPost = false;
     post.id && this.postService.selectPost(post.id);
   }
-}
+
+  onAddPost() {
+    this.showAddPost = true;
+  }
+} // The End of Class;

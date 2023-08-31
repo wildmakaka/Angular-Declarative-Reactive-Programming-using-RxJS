@@ -4,13 +4,16 @@ import {
   Subject,
   catchError,
   combineLatest,
-  delay,
+  concatMap,
   forkJoin,
   map,
-  share,
+  merge,
+  of,
+  scan,
+  shareReplay,
   throwError,
 } from 'rxjs';
-import { IPost } from 'src/app/models/IPost';
+import { CRUDAction, IPost } from 'src/app/models/IPost';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 
 @Injectable({
@@ -22,7 +25,6 @@ export class DeclarativePostService {
       `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`
     )
     .pipe(
-      delay(2000),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {
@@ -31,7 +33,7 @@ export class DeclarativePostService {
         return postsData;
       }),
       catchError(this.handleError),
-      share()
+      shareReplay(1)
     );
 
   postsWithCategory$ = forkJoin([
@@ -48,20 +50,91 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
+
+  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDAction$ = this.postCRUDSubject.asObservable();
+
+  allPosts$ = merge(
+    this.postsWithCategory$,
+    this.postCRUDAction$.pipe(
+      concatMap((postAction) =>
+        this.savePosts(postAction).pipe(
+          map((post) => ({ ...postAction, data: post }))
+        )
+      )
+    )
+  ).pipe(
+    scan((posts, value) => {
+      return this.modifyPosts(posts, value);
+    }, [] as IPost[]),
+    shareReplay(1)
+  );
+
+  modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
+    if (!(value instanceof Array)) {
+      if (value.action === 'add') {
+        return [...posts, value.data];
+      }
+    } else {
+      return value;
+    }
+
+    return posts;
+  }
+
+  savePosts(postAction: CRUDAction<IPost>) {
+    if (postAction.action === 'add') {
+      return this.addPostToServer(postAction.data).pipe(
+        concatMap((post) =>
+          this.categoryService.categories$.pipe(
+            map((categories) => {
+              return {
+                ...post,
+                categoryName: categories.find(
+                  (category) => category.id === post.categoryId
+                )?.title,
+              };
+            })
+          )
+        )
+      );
+    }
+
+    return of(postAction.data);
+  }
+
+  addPostToServer(post: IPost) {
+    return this.http
+      .post<{ name: string }>(
+        `https://rxjs-posts-default-rtdb.firebaseio.com/posts.json`,
+        post
+      )
+      .pipe(
+        map((id) => {
+          return {
+            ...post,
+            id: id.name,
+          };
+        })
+      );
+  }
+
+  addPost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'add', data: post });
+  }
 
   private selectedPostSubject = new Subject<string>();
   selectedPostAction$ = this.selectedPostSubject.asObservable();
 
-  post$ = combineLatest([
-    this.postsWithCategory$,
-    this.selectedPostAction$,
-  ]).pipe(
+  post$ = combineLatest([this.allPosts$, this.selectedPostAction$]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   constructor(
