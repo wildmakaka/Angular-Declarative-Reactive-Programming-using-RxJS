@@ -4,13 +4,23 @@
   </div>
 </div>
 
-<h3>Posts Details</h3>
+<div class="row" *ngIf="post$ | async as post">
+  <div class="col-md-12">
+    <button class="btn btn-warning" (click)="onUpdatePost()">
+      Update Post
+    </button>
 
-<br />
+    <br /><br />
 
-<div *ngIf="post$ | async as post">
-  <div>Id: {{ post.id }}</div>
-  <div>Title: {{ post.title }}</div>
-  <div>Description: {{ post.description }}</div>
-  <div>Category: {{ post.categoryName }}</div>
+    <h3>Posts Details</h3>
+
+    <br />
+
+    <div>Id: {{ post.id }}</div>
+    <div>Title: {{ post.title }}</div>
+    <div>Description: {{ post.description }}</div>
+    <div>Category: {{ post.categoryName }}</div>
+  </div>
+
+  <app-update-post *ngIf="showUpdatePost"></app-update-post>
 </div>
