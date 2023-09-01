@@ -14,7 +14,7 @@ export class DeclarativePostsComponent implements OnInit {
   selectedCategorySubject = new BehaviorSubject<string>('');
   selectedCategoryAction$ = this.selectedCategorySubject.asObservable();
 
-  posts$ = this.postService.postsWithCategory$;
+  posts$ = this.postService.allPosts$;
   categories$ = this.categoryService.categories$;
   selectedCategoryId = '';
 

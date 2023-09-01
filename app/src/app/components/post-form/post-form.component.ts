@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map, tap } from 'rxjs';
@@ -9,8 +9,10 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   selector: 'app-post-form',
   templateUrl: './post-form.component.html',
   styleUrls: ['./post-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostFormComponent {
+  postId = '';
   post$ = this.postService.post$.pipe(
     tap((post) => {
       post &&
@@ -35,6 +37,9 @@ export class PostFormComponent {
   selectedPostId = this.route.paramMap.pipe(
     map((paramMap) => {
       let id = paramMap.get('id');
+      if (id) {
+        this.postId = id;
+      }
       this.postService.selectPost(id + '');
       return id;
     })
@@ -49,6 +54,17 @@ export class PostFormComponent {
   ) {}
 
   onPostSubmit() {
-    console.log(this.postForm.value);
+    let postDetails = this.postForm.value;
+
+    if (this.postId) {
+      // @ts-ignore
+      postDetails = { ...postDetails, id: this.postId };
+
+      // @ts-ignore
+      this.postService.updatePost(postDetails);
+    } else {
+      // @ts-ignore
+      this.postService.addPost(postDetails);
+    }
   }
 } // The End of Class;

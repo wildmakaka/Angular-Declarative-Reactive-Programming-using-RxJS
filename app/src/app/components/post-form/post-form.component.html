@@ -21,7 +21,9 @@
       </select>
     </div>
     <div>
-      <button class="btn btn-primary" type="submit">Add Post</button>
+      <button class="btn btn-primary" type="submit">
+        {{ postId ? 'Update Post' : 'Add Post' }}
+      </button>
     </div>
   </form>
 </div>
