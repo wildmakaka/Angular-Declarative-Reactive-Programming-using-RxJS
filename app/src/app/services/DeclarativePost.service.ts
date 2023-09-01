@@ -88,6 +88,9 @@ export class DeclarativePostService {
           post.id === value.data.id ? value.data : post
         );
       }
+      if (value.action === 'delete') {
+        return posts.filter((post) => post.id !== value.data.id);
+      }
     } else {
       return value;
     }
@@ -103,6 +106,12 @@ export class DeclarativePostService {
     }
     if (postAction.action === 'update') {
       postDetails$ = this.updatePostToServer(postAction.data);
+    }
+
+    if (postAction.action === 'delete') {
+      return (postDetails$ = this.deletePostToServer(postAction.data).pipe(
+        map((post) => postAction.data)
+      ));
     }
 
     return postDetails$.pipe(
@@ -144,12 +153,22 @@ export class DeclarativePostService {
     );
   }
 
+  deletePostToServer(post: IPost) {
+    return this.http.delete(
+      `https://rxjs-posts-default-rtdb.firebaseio.com/posts/${post.id}.json`
+    );
+  }
+
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
   }
 
   updatePost(post: IPost) {
     this.postCRUDSubject.next({ action: 'update', data: post });
+  }
+
+  deletePost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'delete', data: post });
   }
 
   private selectedPostSubject = new Subject<string>();
