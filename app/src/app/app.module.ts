@@ -13,6 +13,7 @@ import { DeclarativePostsComponent } from './pages/declarative-posts/declarative
 import { HomeComponent } from './pages/home/home.component';
 import { PostsComponent } from './pages/posts/posts.component';
 import { UpdatePostComponent } from './components/update-post/update-post.component';
+import { PostFormComponent } from './components/post-form/post-form.component';
 
 @NgModule({
   imports: [
@@ -32,6 +33,7 @@ import { UpdatePostComponent } from './components/update-post/update-post.compon
     LoadingComponent,
     AddPostComponent,
     UpdatePostComponent,
+    PostFormComponent,
   ],
 
   providers: [],
