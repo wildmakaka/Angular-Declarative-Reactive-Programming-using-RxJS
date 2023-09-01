@@ -11,9 +11,12 @@ import { DeclarativePostService } from 'src/app/services/DeclarativePost.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdatePostComponent {
+  postId: string = '';
+
   categories$ = this.categoryService.categories$;
   post$ = this.postService.post$.pipe(
     tap((post) => {
+      this.postId = post?.id + '';
       this.postForm.setValue({
         // @ts-ignore
         title: post?.title,
@@ -35,4 +38,14 @@ export class UpdatePostComponent {
     private categoryService: DeclarativeCategoryService,
     private postService: DeclarativePostService
   ) {}
-}
+
+  onUpdatePost() {
+    let postDetails = {
+      ...this.postForm.value,
+      id: this.postId,
+    };
+
+    // @ts-ignore
+    this.postService.updatePost(postDetails);
+  }
+} // The End of Class;
