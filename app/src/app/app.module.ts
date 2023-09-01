@@ -12,6 +12,7 @@ import { AltPostsComponent } from './pages/alt-posts/alt-posts.component';
 import { DeclarativePostsComponent } from './pages/declarative-posts/declarative-posts.component';
 import { HomeComponent } from './pages/home/home.component';
 import { PostsComponent } from './pages/posts/posts.component';
+import { UpdatePostComponent } from './components/update-post/update-post.component';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { PostsComponent } from './pages/posts/posts.component';
     SinglePostComponent,
     LoadingComponent,
     AddPostComponent,
+    UpdatePostComponent,
   ],
 
   providers: [],
