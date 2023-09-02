@@ -11,10 +11,12 @@ import {
   merge,
   scan,
   shareReplay,
+  tap,
   throwError,
 } from 'rxjs';
 import { CRUDAction, IPost } from 'src/app/models/IPost';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
+import { NotificationService } from 'src/app/services/Notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -75,7 +77,8 @@ export class DeclarativePostService {
 
   constructor(
     private http: HttpClient,
-    private categoryService: DeclarativeCategoryService
+    private categoryService: DeclarativeCategoryService,
+    private notificationService: NotificationService
   ) {}
 
   modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
@@ -102,14 +105,29 @@ export class DeclarativePostService {
     let postDetails$!: Observable<IPost>;
 
     if (postAction.action === 'add') {
-      postDetails$ = this.addPostToServer(postAction.data);
+      postDetails$ = this.addPostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage('Post Added Successfully');
+        })
+      );
     }
     if (postAction.action === 'update') {
-      postDetails$ = this.updatePostToServer(postAction.data);
+      postDetails$ = this.updatePostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage(
+            'Post Updated Successfully'
+          );
+        })
+      );
     }
 
     if (postAction.action === 'delete') {
       return (postDetails$ = this.deletePostToServer(postAction.data).pipe(
+        tap((post) => {
+          this.notificationService.setSuccessMessage(
+            'Post Deleted Successfully'
+          );
+        }),
         map((post) => postAction.data)
       ));
     }
