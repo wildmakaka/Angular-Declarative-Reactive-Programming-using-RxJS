@@ -72,7 +72,8 @@ export class DeclarativePostService {
     scan((posts, value) => {
       return this.modifyPosts(posts, value);
     }, [] as IPost[]),
-    shareReplay(1)
+    shareReplay(1),
+    catchError(this.handleError)
   );
 
   private postCRUDCompleteSubject = new Subject<boolean>();
@@ -112,7 +113,8 @@ export class DeclarativePostService {
         tap((post) => {
           this.notificationService.setSuccessMessage('Post Added Successfully');
           this.postCRUDCompleteSubject.next(true);
-        })
+        }),
+        catchError(this.handleError)
       );
     }
     if (postAction.action === 'update') {
@@ -122,7 +124,8 @@ export class DeclarativePostService {
             'Post Updated Successfully'
           );
           this.postCRUDCompleteSubject.next(true);
-        })
+        }),
+        catchError(this.handleError)
       );
     }
 
@@ -134,7 +137,8 @@ export class DeclarativePostService {
           );
           this.postCRUDCompleteSubject.next(true);
         }),
-        map((post) => postAction.data)
+        map((post) => postAction.data),
+        catchError(this.handleError)
       ));
     }
 

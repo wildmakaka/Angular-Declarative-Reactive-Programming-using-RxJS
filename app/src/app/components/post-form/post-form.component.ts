@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, map, startWith, tap } from 'rxjs';
+import { EMPTY, catchError, combineLatest, map, startWith, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/DeclarativeCategory.service';
 import { DeclarativePostService } from 'src/app/services/DeclarativePost.service';
 import { NotificationService } from 'src/app/services/Notification.service';
@@ -25,6 +25,10 @@ export class PostFormComponent {
           //@ts-ignore
           categoryId: post?.categoryId,
         });
+    }),
+    catchError((error) => {
+      this.notificationService.setErrorMessage(error);
+      return EMPTY;
     })
   );
   categories$ = this.categoryService.categories$;
